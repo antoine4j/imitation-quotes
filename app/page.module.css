@@ -1,0 +1,52 @@
+.page {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: #f5f1e8;
+  color: #1d1d1d;
+}
+
+.main {
+  display: flex;
+  width: 100%;
+  max-width: 720px;
+  flex-direction: column;
+  gap: 20px;
+  padding: 72px 32px;
+}
+
+.kicker {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6a6357;
+}
+
+.intro h1 {
+  max-width: 560px;
+  font-size: 48px;
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.intro p {
+  max-width: 620px;
+  font-size: 18px;
+  line-height: 1.6;
+  text-wrap: balance;
+  color: #4c4a45;
+}
+
+@media (max-width: 600px) {
+  .main {
+    padding: 56px 24px;
+  }
+
+  .intro h1 {
+    font-size: 36px;
+  }
+}
