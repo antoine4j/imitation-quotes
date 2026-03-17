@@ -34,3 +34,9 @@ npm run lint
 ```
 
 Plain-English note: in `Next.js`, the development server automatically reloads the page when you edit files like `app/page.js`.
+
+## Deployment
+
+Preview deployments are hosted on `Vercel`.
+
+Plain-English note: when the repository is connected to `Vercel`, each pull request can get its own temporary preview URL so the current branch can be reviewed in the browser before merge.
