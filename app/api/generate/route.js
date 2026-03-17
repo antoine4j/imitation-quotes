@@ -54,6 +54,8 @@ export async function POST(request) {
         is_fallback: image.isFallback,
         url: image.url,
         alt: image.alt,
+        width: image.width,
+        height: image.height,
         source_page_url: image.sourcePageUrl,
         source_title: image.sourceTitle,
       },

@@ -185,7 +185,6 @@
 .imagePanel {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
   margin-bottom: 18px;
   border-radius: 18px;
   background:
@@ -196,17 +195,38 @@
     0 14px 30px rgba(36, 26, 18, 0.16);
 }
 
+.imageReal {
+  display: table;
+  max-width: 100%;
+  margin-inline: auto;
+  background: none;
+  box-shadow: none;
+}
+
 .imageFallback {
+  aspect-ratio: 16 / 9;
   background:
     radial-gradient(circle at top, rgba(255, 250, 240, 0.68), transparent 38%),
     linear-gradient(135deg, #8c6b42 0%, #68482b 46%, #2e1f16 100%);
 }
 
+.imageFrame {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  max-height: min(75vh, 820px);
+  align-items: flex-start;
+  justify-content: center;
+  background: rgba(36, 26, 18, 0.08);
+}
+
 .resultImage {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(75vh, 820px);
+  object-fit: contain;
 }
 
 .fallbackArtwork {
@@ -304,8 +324,20 @@
   }
 
   .imagePanel {
-    aspect-ratio: 4 / 3;
     margin-bottom: 16px;
+  }
+
+  .imageReal {
+    display: block;
+  }
+
+  .imageFallback {
+    aspect-ratio: 4 / 3;
+  }
+
+  .imageFrame,
+  .resultImage {
+    max-height: min(62vh, 620px);
   }
 
   .controls {
