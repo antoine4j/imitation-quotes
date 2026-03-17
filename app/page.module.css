@@ -141,6 +141,28 @@
   transform: translateY(0);
 }
 
+.button:disabled {
+  cursor: wait;
+  transform: none;
+  box-shadow: 0 10px 20px rgba(47, 36, 25, 0.14);
+  opacity: 0.74;
+}
+
+.errorMessage,
+.statusMessage {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.errorMessage {
+  color: #8a2f2f;
+}
+
+.statusMessage {
+  color: #4f6a35;
+}
+
 .disclosure {
   max-width: 580px;
   margin-top: 18px;
