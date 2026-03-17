@@ -148,16 +148,21 @@ export default function Home() {
               <div
                 className={`${styles.imagePanel} ${
                   generatedQuote.image?.is_fallback ? styles.imageFallback : ""
+                } ${
+                  generatedQuote.image?.url ? styles.imageReal : ""
                 }`}
               >
                 {generatedQuote.image?.url ? (
-                  <Image
-                    className={styles.resultImage}
-                    src={generatedQuote.image.url}
-                    alt={generatedQuote.image.alt}
-                    fill
-                    sizes="(max-width: 600px) 100vw, 712px"
-                  />
+                  <div className={styles.imageFrame}>
+                    <Image
+                      className={styles.resultImage}
+                      src={generatedQuote.image.url}
+                      alt={generatedQuote.image.alt}
+                      width={generatedQuote.image.width}
+                      height={generatedQuote.image.height}
+                      sizes="(max-width: 600px) 100vw, 712px"
+                    />
+                  </div>
                 ) : (
                   <div className={styles.fallbackArtwork} aria-hidden="true">
                     <div className={styles.fallbackGlow} />
