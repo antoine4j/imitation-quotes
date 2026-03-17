@@ -16,6 +16,18 @@ Install dependencies:
 npm install
 ```
 
+Set the required OpenAI API key before starting the app:
+
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+```
+
+Optional: override the default model used for Story 3 quote generation.
+
+```bash
+export OPENAI_MODEL="gpt-5-mini"
+```
+
 Start the development server:
 
 ```bash
@@ -34,6 +46,8 @@ npm run lint
 ```
 
 Plain-English note: in `Next.js`, the development server automatically reloads the page when you edit files like `app/page.js`.
+
+For Story 3, the `/api/generate` route calls OpenAI on the server, so the API key must be present in the shell where you run `npm run dev`. In `Vercel`, the same key needs to be configured as a project environment variable for preview verification.
 
 ## Deployment
 

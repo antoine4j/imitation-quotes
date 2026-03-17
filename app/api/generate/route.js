@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { generateQuoteForPersonality } from "@/lib/openaiQuoteGeneration";
 import { validatePersonalityName } from "@/lib/personalitySubmission";
+
+export const runtime = "nodejs";
 
 export async function POST(request) {
   let requestBody;
@@ -31,9 +34,27 @@ export async function POST(request) {
     );
   }
 
-  return NextResponse.json({
-    status: "accepted",
-    personalityName: validationResult.value,
-    message: `Generation started for ${validationResult.value}.`,
-  });
+  try {
+    const generatedQuote = await generateQuoteForPersonality(
+      validationResult.value,
+    );
+
+    return NextResponse.json({
+      status: generatedQuote.status,
+      display_name: generatedQuote.displayName,
+      quote: generatedQuote.quote,
+      disclaimer: generatedQuote.disclaimer,
+      visual_hint: generatedQuote.visualHint,
+    });
+  } catch (error) {
+    console.error("Quote generation failed.", error);
+
+    return NextResponse.json(
+      {
+        status: "error",
+        message: "Unable to generate a quote right now.",
+      },
+      { status: 500 },
+    );
+  }
 }
