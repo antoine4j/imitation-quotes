@@ -24,6 +24,7 @@
 .DS_Store
 *.pem
 AGENTS.md
+.artifacts/
 
 # debug
 npm-debug.log*

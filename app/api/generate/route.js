@@ -6,6 +6,26 @@ import { resolveImageForPersonality } from "@/lib/wikimediaImageLookup";
 
 export const runtime = "nodejs";
 
+function buildMockQuoteResponse(personalityName) {
+  return {
+    status: "success",
+    display_name: personalityName,
+    quote: `Build boldly, refine patiently, and let the work fill the room.`,
+    disclaimer:
+      "This quote is AI-generated in a local browser-loop mock mode. It is not an authentic quotation.",
+    visual_hint: `A cinematic editorial portrait inspired by ${personalityName}`,
+    image: {
+      is_fallback: true,
+      url: null,
+      alt: `Fallback visual texture for ${personalityName}`,
+      width: null,
+      height: null,
+      source_page_url: null,
+      source_title: null,
+    },
+  };
+}
+
 export async function POST(request) {
   let requestBody;
 
@@ -33,6 +53,10 @@ export async function POST(request) {
       },
       { status: 400 },
     );
+  }
+
+  if (process.env.BROWSER_LOOP_MOCK === "1") {
+    return NextResponse.json(buildMockQuoteResponse(validationResult.value));
   }
 
   try {
