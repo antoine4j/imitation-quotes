@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 import { validatePersonalityName } from "@/lib/personalitySubmission";
@@ -59,6 +60,7 @@ export default function Home() {
         displayName: responseBody.display_name,
         quote: responseBody.quote,
         disclaimer: responseBody.disclaimer,
+        image: responseBody.image,
       });
       setStatusMessage("");
       setPersonalityName(validationResult.value);
@@ -143,6 +145,27 @@ export default function Home() {
 
           {generatedQuote ? (
             <section className={styles.resultCard} aria-live="polite">
+              <div
+                className={`${styles.imagePanel} ${
+                  generatedQuote.image?.is_fallback ? styles.imageFallback : ""
+                }`}
+              >
+                {generatedQuote.image?.url ? (
+                  <Image
+                    className={styles.resultImage}
+                    src={generatedQuote.image.url}
+                    alt={generatedQuote.image.alt}
+                    fill
+                    sizes="(max-width: 600px) 100vw, 712px"
+                  />
+                ) : (
+                  <div className={styles.fallbackArtwork} aria-hidden="true">
+                    <div className={styles.fallbackGlow} />
+                    <div className={styles.fallbackRing} />
+                    <div className={styles.fallbackStripe} />
+                  </div>
+                )}
+              </div>
               <p className={styles.resultEyebrow}>Generated result</p>
               <blockquote className={styles.quote}>
                 &ldquo;{generatedQuote.quote}&rdquo;
