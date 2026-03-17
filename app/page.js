@@ -10,6 +10,7 @@ export default function Home() {
   const [personalityName, setPersonalityName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  const [generatedQuote, setGeneratedQuote] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event) {
@@ -24,11 +25,13 @@ export default function Home() {
     if (!validationResult.ok) {
       setErrorMessage(validationResult.message);
       setStatusMessage("");
+      setGeneratedQuote(null);
       return;
     }
 
     setErrorMessage("");
-    setStatusMessage("");
+    setStatusMessage("Generating quote...");
+    setGeneratedQuote(null);
     setIsSubmitting(true);
 
     try {
@@ -46,15 +49,22 @@ export default function Home() {
 
       if (!response.ok) {
         setErrorMessage(
-          responseBody.message || "Unable to start quote generation.",
+          responseBody.message || "Unable to generate a quote right now.",
         );
+        setStatusMessage("");
         return;
       }
 
-      setStatusMessage(responseBody.message || "Generation started.");
+      setGeneratedQuote({
+        displayName: responseBody.display_name,
+        quote: responseBody.quote,
+        disclaimer: responseBody.disclaimer,
+      });
+      setStatusMessage("");
       setPersonalityName(validationResult.value);
     } catch {
-      setErrorMessage("Unable to start quote generation right now.");
+      setErrorMessage("Unable to generate a quote right now.");
+      setStatusMessage("");
     } finally {
       setIsSubmitting(false);
     }
@@ -98,10 +108,18 @@ export default function Home() {
                   if (statusMessage) {
                     setStatusMessage("");
                   }
+
+                  if (generatedQuote) {
+                    setGeneratedQuote(null);
+                  }
                 }}
               />
-              <button className={styles.button} type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Starting..." : "Generate quote"}
+              <button
+                className={styles.button}
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Generating..." : "Generate quote"}
               </button>
             </div>
 
@@ -122,6 +140,21 @@ export default function Home() {
             Outputs in later steps will be clearly labeled as AI-generated, not
             authentic quotations.
           </p>
+
+          {generatedQuote ? (
+            <section className={styles.resultCard} aria-live="polite">
+              <p className={styles.resultEyebrow}>Generated result</p>
+              <blockquote className={styles.quote}>
+                &ldquo;{generatedQuote.quote}&rdquo;
+              </blockquote>
+              <p className={styles.attribution}>
+                Inspired by {generatedQuote.displayName}
+              </p>
+              <p className={styles.resultDisclosure}>
+                {generatedQuote.disclaimer}
+              </p>
+            </section>
+          ) : null}
         </section>
       </main>
     </div>
