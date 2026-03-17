@@ -2,13 +2,62 @@
 
 import { useState } from "react";
 
+import { validatePersonalityName } from "@/lib/personalitySubmission";
+
 import styles from "./page.module.css";
 
 export default function Home() {
   const [personalityName, setPersonalityName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    const validationResult = validatePersonalityName(personalityName);
+
+    if (!validationResult.ok) {
+      setErrorMessage(validationResult.message);
+      setStatusMessage("");
+      return;
+    }
+
+    setErrorMessage("");
+    setStatusMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          personalityName: validationResult.value,
+        }),
+      });
+
+      const responseBody = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(
+          responseBody.message || "Unable to start quote generation.",
+        );
+        return;
+      }
+
+      setStatusMessage(responseBody.message || "Generation started.");
+      setPersonalityName(validationResult.value);
+    } catch {
+      setErrorMessage("Unable to start quote generation right now.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -39,12 +88,34 @@ export default function Home() {
                 autoComplete="off"
                 placeholder="Abraham Lincoln"
                 value={personalityName}
-                onChange={(event) => setPersonalityName(event.target.value)}
+                onChange={(event) => {
+                  setPersonalityName(event.target.value);
+
+                  if (errorMessage) {
+                    setErrorMessage("");
+                  }
+
+                  if (statusMessage) {
+                    setStatusMessage("");
+                  }
+                }}
               />
-              <button className={styles.button} type="submit">
-                Generate quote
+              <button className={styles.button} type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Starting..." : "Generate quote"}
               </button>
             </div>
+
+            {errorMessage ? (
+              <p className={styles.errorMessage} role="alert">
+                {errorMessage}
+              </p>
+            ) : null}
+
+            {statusMessage ? (
+              <p className={styles.statusMessage} aria-live="polite">
+                {statusMessage}
+              </p>
+            ) : null}
           </form>
 
           <p className={styles.disclosure}>
