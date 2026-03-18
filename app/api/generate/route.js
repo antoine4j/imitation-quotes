@@ -7,10 +7,19 @@ import { resolveImageForPersonality } from "@/lib/wikimediaImageLookup";
 export const runtime = "nodejs";
 
 function buildMockQuoteResponse(personalityName) {
+  if (personalityName === "Unknown Person") {
+    return {
+      status: "no_result",
+      reason_code: "unknown_personality",
+      user_message:
+        "I couldn't confidently place that personality. Try a more specific famous person or character.",
+    };
+  }
+
   return {
     status: "success",
     display_name: personalityName,
-    quote: `Build boldly, refine patiently, and let the work fill the room.`,
+    quote: `Build the world you want to inhabit, then keep refining it until the future can breathe inside it.`,
     disclaimer:
       "This quote is AI-generated in a local browser-loop mock mode. It is not an authentic quotation.",
     visual_hint: `A cinematic editorial portrait inspired by ${personalityName}`,
@@ -63,6 +72,15 @@ export async function POST(request) {
     const generatedQuote = await generateQuoteForPersonality(
       validationResult.value,
     );
+
+    if (generatedQuote.status === "no_result") {
+      return NextResponse.json({
+        status: generatedQuote.status,
+        reason_code: generatedQuote.reasonCode,
+        user_message: generatedQuote.userMessage,
+      });
+    }
+
     const image = await resolveImageForPersonality(
       generatedQuote.displayName,
       generatedQuote.visualHint,
