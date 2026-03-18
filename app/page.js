@@ -6,6 +6,59 @@ import { validatePersonalityName } from "@/lib/personalitySubmission";
 
 import styles from "./page.module.css";
 
+const EXAMPLE_PERSONALITIES = [
+  "Marie Curie",
+  "Shakespeare",
+  "Einstein",
+  "Frida Kahlo",
+];
+
+function joinClassNames(...classNames) {
+  return classNames.filter(Boolean).join(" ");
+}
+
+function capitalizeSentenceStart(text) {
+  if (!text) {
+    return "";
+  }
+
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function ensureSentenceEnding(text) {
+  if (!text) {
+    return "";
+  }
+
+  return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
+function formatDisclosureLines(disclaimer) {
+  if (!disclaimer) {
+    return [];
+  }
+
+  const semicolonParts = disclaimer
+    .split(/\s*;\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (semicolonParts.length > 1) {
+    return semicolonParts.map((part, index) =>
+      ensureSentenceEnding(
+        index === 0 ? part : capitalizeSentenceStart(part),
+      ),
+    );
+  }
+
+  const sentenceMatches =
+    disclaimer.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map((sentence) =>
+      sentence.trim(),
+    ) || [];
+
+  return sentenceMatches.filter(Boolean);
+}
+
 export default function Home() {
   const inputRef = useRef(null);
   const [personalityName, setPersonalityName] = useState("");
@@ -103,6 +156,17 @@ export default function Home() {
     });
   }
 
+  function handleExampleSelect(name) {
+    setPersonalityName(name);
+    setErrorMessage("");
+    setStatusMessage("");
+    setGeneratedQuote(null);
+
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }
+
   const isShowingResult = Boolean(generatedQuote);
   const hasRealImage =
     Boolean(generatedQuote?.image?.url) && !generatedQuote?.image?.is_fallback;
@@ -124,6 +188,16 @@ export default function Home() {
   ]
     .filter(Boolean)
     .join(" ");
+  const feedbackMessage = errorMessage || (!isSubmitting ? statusMessage : "");
+  const feedbackClassName = errorMessage
+    ? styles.errorMessage
+    : statusMessage
+      ? styles.statusMessage
+      : "";
+  const disclosureLines = formatDisclosureLines(generatedQuote?.disclaimer);
+  const sceneKey = isShowingResult
+    ? `${generatedQuote.displayName}-${generatedQuote.quote}`
+    : "input";
 
   return (
     <div className={pageClassName}>
@@ -147,7 +221,7 @@ export default function Home() {
 
       <div className={styles.contentLayer}>
         <header className={styles.header}>
-          <div>
+          <div className={styles.headerInner}>
             <h1 className={styles.brand}>Imitation Quotes</h1>
             <p className={styles.brandTagline}>
               AI-inspired wisdom from history&apos;s voices
@@ -157,63 +231,71 @@ export default function Home() {
 
         <main className={styles.main}>
           {isShowingResult ? (
-            <section className={styles.resultShell} aria-live="polite">
-              <p className={styles.resultEyebrow}>AI-generated interpretation</p>
+            <section
+              key={sceneKey}
+              className={joinClassNames(styles.scene, styles.resultScene)}
+              aria-live="polite"
+            >
               <div className={styles.quoteMark} aria-hidden="true">
                 &rdquo;
               </div>
               <blockquote className={styles.quote}>
                 &ldquo;{generatedQuote.quote}&rdquo;
               </blockquote>
-              <p className={styles.attribution}>
-                Inspired by {generatedQuote.displayName}
-              </p>
-              <button
-                className={styles.retryButton}
-                type="button"
-                onClick={handleReset}
-              >
-                <span className={styles.retryIcon} aria-hidden="true">
-                  <svg viewBox="0 0 24 24" focusable="false">
-                    <path
-                      d="M3 12a9 9 0 0 1 15.36-6.36L21 8"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M21 3v5h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M21 12a9 9 0 0 1-15.36 6.36L3 16"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M3 21v-5h5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-                <span>Try Another</span>
-              </button>
+              <div className={styles.resultMeta}>
+                <p className={styles.attribution}>
+                  Inspired by {generatedQuote.displayName}
+                </p>
+                <button
+                  className={styles.retryButton}
+                  type="button"
+                  onClick={handleReset}
+                >
+                  <span className={styles.retryIcon} aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path
+                        d="M3 12a9 9 0 0 1 15.36-6.36L21 8"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M21 3v5h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M21 12a9 9 0 0 1-15.36 6.36L3 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M3 21v-5h5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <span>Try Another</span>
+                </button>
+              </div>
             </section>
           ) : (
-            <section className={styles.inputShell}>
+            <section
+              key={sceneKey}
+              className={joinClassNames(styles.scene, styles.inputScene)}
+            >
               <div className={styles.inputIntro}>
                 <h2 className={styles.title}>Who inspires you?</h2>
                 <p className={styles.description}>
@@ -222,7 +304,10 @@ export default function Home() {
               </div>
 
               <form className={styles.form} onSubmit={handleSubmit}>
-                <div className={styles.controls}>
+                <label className={styles.visuallyHidden} htmlFor="personality-name">
+                  Personality name
+                </label>
+                <div className={styles.inputFrame}>
                   <input
                     ref={inputRef}
                     id="personality-name"
@@ -235,11 +320,17 @@ export default function Home() {
                     onChange={handleInputChange}
                     disabled={isSubmitting}
                     aria-label="Personality name"
+                    suppressHydrationWarning
                   />
+                </div>
+                <div className={styles.controls}>
                   <button
-                    className={styles.button}
+                    className={joinClassNames(
+                      styles.button,
+                      isSubmitting ? styles.buttonSubmitting : "",
+                    )}
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !personalityName.trim()}
                   >
                     <span className={styles.buttonIcon} aria-hidden="true">
                       {isSubmitting ? (
@@ -262,12 +353,40 @@ export default function Home() {
                       ) : (
                         <svg viewBox="0 0 24 24" focusable="false">
                           <path
-                            d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z"
-                            fill="currentColor"
+                            d="M12 4.8c.2 0 .38.14.44.34l1.14 4.31c.03.12.12.21.24.24l4.31 1.14c.2.06.34.24.34.44s-.14.38-.34.44l-4.31 1.14a.35.35 0 0 0-.24.24l-1.14 4.31a.46.46 0 0 1-.88 0l-1.14-4.31a.35.35 0 0 0-.24-.24l-4.31-1.14a.46.46 0 0 1 0-.88l4.31-1.14c.12-.03.21-.12.24-.24l1.14-4.31c.06-.2.24-.34.44-.34Z"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.45"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
-                            d="M18.5 4l.7 2.3L21.5 7l-2.3.7L18.5 10l-.7-2.3L15.5 7l2.3-.7.7-2.3Z"
-                            fill="currentColor"
+                            d="M18.55 5.55v2.9"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.45"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M17.1 7h2.9"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.45"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M6.95 14.65v1.75"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.45"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M6.08 15.52h1.75"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.45"
+                            strokeLinecap="round"
                           />
                         </svg>
                       )}
@@ -278,55 +397,56 @@ export default function Home() {
                   </button>
                 </div>
 
-                {errorMessage ? (
-                  <p className={styles.errorMessage} role="alert">
-                    {errorMessage}
-                  </p>
-                ) : null}
-
-                {statusMessage ? (
-                  <p className={styles.statusMessage} aria-live="polite">
-                    {statusMessage}
-                  </p>
-                ) : null}
+                <div className={styles.feedback} aria-live="polite">
+                  {feedbackMessage ? (
+                    <p
+                      className={joinClassNames(
+                        styles.feedbackMessage,
+                        feedbackClassName,
+                      )}
+                      role={errorMessage ? "alert" : undefined}
+                    >
+                      {feedbackMessage}
+                    </p>
+                  ) : null}
+                </div>
               </form>
 
-              <div className={styles.examples} aria-label="Example personalities">
+              <div
+                className={styles.examples}
+                aria-label="Example personalities"
+              >
                 <span className={styles.examplesLabel}>Try:</span>
-                <div className={styles.exampleGrid}>
-                  {[
-                    "Marie Curie",
-                    "Shakespeare",
-                    "Einstein",
-                    "Frida Kahlo",
-                  ].map((name) => (
-                    <button
-                      key={name}
-                      type="button"
-                      className={styles.exampleChip}
-                      onClick={() => {
-                        setPersonalityName(name);
-                        setErrorMessage("");
-                        setStatusMessage("");
-                        requestAnimationFrame(() => {
-                          inputRef.current?.focus();
-                        });
-                      }}
-                    >
-                      {name}
-                    </button>
-                  ))}
-                </div>
+                {EXAMPLE_PERSONALITIES.map((name) => (
+                  <button
+                    key={name}
+                    type="button"
+                    className={styles.exampleChip}
+                    onClick={() => handleExampleSelect(name)}
+                  >
+                    {name}
+                  </button>
+                ))}
               </div>
             </section>
           )}
         </main>
 
-        <footer className={styles.footer}>
-          <p className={styles.disclosure}>
-            {generatedQuote?.disclaimer ||
-              "Outputs are clearly labeled as AI-generated, not authentic quotations."}
-          </p>
+        <footer
+          className={joinClassNames(
+            styles.footer,
+            isShowingResult ? styles.footerResult : styles.footerInput,
+          )}
+        >
+          {isShowingResult ? (
+            <p className={styles.disclosure}>
+              {disclosureLines.map((line, index) => (
+                <span key={`${line}-${index}`} className={styles.disclosureLine}>
+                  {line}
+                </span>
+              ))}
+            </p>
+          ) : null}
         </footer>
       </div>
     </div>

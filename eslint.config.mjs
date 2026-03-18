@@ -10,6 +10,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local Figma export used only as design reference material.
+    "figma_download/**",
   ]),
 ]);
 
