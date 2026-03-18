@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "browser:check": "node scripts/browser-loop.mjs --viewport desktop",
+    "browser:check:mobile": "node scripts/browser-loop.mjs --viewport mobile",
+    "browser:mcp:check": "npx playwright-mcp --help"
   },
   "dependencies": {
     "next": "16.1.6",
@@ -15,7 +18,9 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@playwright/mcp": "^0.0.68",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6"
+    "eslint-config-next": "16.1.6",
+    "playwright": "^1.59.0-alpha-1771104257000"
   }
 }
