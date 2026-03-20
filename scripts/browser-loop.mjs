@@ -235,11 +235,13 @@ async function main() {
 
     const quoteLocator = page.locator("blockquote");
     const errorLocator = page.locator("form [role='alert']");
+    const feedbackLocator = page.locator("form p");
 
     await page.waitForFunction(
       () =>
         Boolean(document.querySelector("blockquote")) ||
-        Boolean(document.querySelector("form [role='alert']")),
+        Boolean(document.querySelector("form [role='alert']")) ||
+        Boolean(document.querySelector("form p")),
       null,
       { timeout: options.timeoutMs },
     );
@@ -256,6 +258,37 @@ async function main() {
         "utf8",
       );
       throw new Error(diagnostics.errorMessage || "Browser loop reached an error state.");
+    }
+
+    if ((await quoteLocator.count()) === 0 && (await feedbackLocator.isVisible())) {
+      const noResultScreenshot = path.join(runDir, "02-no-result.png");
+      diagnostics.status = "no_result";
+      diagnostics.userMessage = await feedbackLocator.textContent();
+      await page.screenshot({ path: noResultScreenshot, fullPage: true });
+      diagnostics.screenshots.noResult = noResultScreenshot;
+
+      await writeFile(
+        path.join(runDir, "diagnostics.json"),
+        `${JSON.stringify(diagnostics, null, 2)}\n`,
+        "utf8",
+      );
+
+      console.log(
+        JSON.stringify(
+          {
+            status: diagnostics.status,
+            baseUrl,
+            viewport: options.viewport,
+            userMessage: diagnostics.userMessage,
+            screenshots: diagnostics.screenshots,
+            diagnosticsFile: path.join(runDir, "diagnostics.json"),
+          },
+          null,
+          2,
+        ),
+      );
+
+      return;
     }
 
     diagnostics.status = "success";

@@ -109,6 +109,17 @@ export default function Home() {
         return;
       }
 
+      if (responseBody.status === "no_result") {
+        setGeneratedQuote(null);
+        setErrorMessage("");
+        setStatusMessage(
+          responseBody.user_message ||
+            "I couldn't confidently generate a quote for that personality.",
+        );
+        setPersonalityName(validationResult.value);
+        return;
+      }
+
       setGeneratedQuote({
         displayName: responseBody.display_name,
         quote: responseBody.quote,
