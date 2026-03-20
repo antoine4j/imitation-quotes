@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test:retry": "node --experimental-default-type=module --test tests/openaiQuoteGeneration.retry.test.mjs",
     "lint": "eslint",
     "browser:check": "node scripts/browser-loop.mjs --viewport desktop",
     "browser:check:mobile": "node scripts/browser-loop.mjs --viewport mobile",
