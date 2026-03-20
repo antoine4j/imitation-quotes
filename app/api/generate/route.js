@@ -19,7 +19,7 @@ function buildMockQuoteResponse(personalityName) {
   return {
     status: "success",
     display_name: personalityName,
-    quote: `Build the world you want to inhabit, then keep refining it until the future can breathe inside it.`,
+    quote: `Build the future with enough conviction to give it a vocabulary of its own.`,
     disclaimer:
       "This quote is AI-generated in a local browser-loop mock mode. It is not an authentic quotation.",
     visual_hint: `A cinematic editorial portrait inspired by ${personalityName}`,
